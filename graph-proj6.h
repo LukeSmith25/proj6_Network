@@ -76,5 +76,13 @@ class Graph {
         vector<list<Edge> > adjacencyList;
 };
 
+void Graph::addEdge(int from, int to, int cost) {
+    //adjacencyList.find(from);
+}
+
+vector<int> Graph::dijkstra(int source) const {
+    return vector<int>();
+}
+
 #endif
 
