@@ -123,15 +123,16 @@ vector<int> Graph::dijkstra(int source) const {
 
         // From vertex, check all other paths
         for (list<Edge>::const_iterator it = adjacencyList.at(path.first).begin();
-        it != adjacencyList.at(path.first).begin(); it++) {
-            // Calculate current distance + distance to next vertex
-            int newDistance = path.second + it->cost;
+        it != adjacencyList.at(path.first).end(); it++) {
 
             // If not on heap put on heap
             // IsOnHeap()
             if (!heap.isOnHeap(storedAt[path.first])) {
                 storedAt.insert(pair<int,int>(path.first, heap.insert(path)));
             }
+
+            // Calculate current distance + distance to next vertex
+            int newDistance = path.second + it->cost;
 
             // If shorter length update
             // ChangeKey()
