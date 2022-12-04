@@ -2,8 +2,10 @@
 #define GRAPH_PROJ6_H
 
 #include <vector>
+#include <map>
 #include <list>
 #include <cassert>
+#include "arrayheap-student-proj6.h"
 
 using namespace std;
 
@@ -73,15 +75,75 @@ class Graph {
         Graph(const Graph &) { assert(false); }
         const Graph &operator=(const Graph &) { assert(false); return *this; }
 
-        vector<list<Edge> > adjacencyList;
+        vector<list<Edge>> adjacencyList;
 };
 
 void Graph::addEdge(int from, int to, int cost) {
-    //adjacencyList.find(from);
+    Edge newEdge(to, cost);
+    adjacencyList.at(from).push_back(newEdge);
 }
 
 vector<int> Graph::dijkstra(int source) const {
-    return vector<int>();
+    // Distance store final distance
+    vector<int> distance;
+    vector<bool> visited;
+    // Distance, vertex
+    pair<int,int> path;
+    // Heap of different paths
+    ArrayHeap<pair<int,int>> heap;
+    // Map holds (vertex, location in data)
+    map<int,int> storedAt;
+
+    // Set all vertices to INF_COST and false
+    for (int i = 0; i < adjacencyList.size(); i++) {
+        distance.push_back(INFINITE_COST);
+        visited.push_back(false);
+    }
+
+    // Distance from source to itself = 0
+    distance.at(source) = 0; //
+    path.first = source;         // FIRST = VERTEX
+    path.second = 0;            // SECOND = DISTANCE
+
+    // Push first vertex and store index in data
+    storedAt.insert(pair<int,int>(0, heap.insert(path)));
+
+    // Push first to stack then pop stack, then check all of popped nodes neighbors.
+    // If new shortest path is found update shortest path and put back in heap.
+
+    // Find shortest path FROM A VERTEX
+    while (heap.getNumItems() != 0) {
+        // Pop item from heap
+        path = heap.getMinItem();
+        heap.removeMinItem();
+
+        // Update distance because you know it is the shortest distance
+        distance.at(path.first) = path.second;
+        visited.at(path.first) = true;
+
+        // From vertex, check all other paths
+        for (list<Edge>::const_iterator it = adjacencyList.at(path.first).begin();
+        it != adjacencyList.at(path.first).begin(); it++) {
+            // Calculate current distance + distance to next vertex
+            int newDistance = path.second + it->cost;
+
+            // If not on heap put on heap
+            // IsOnHeap()
+            if (!heap.isOnHeap(storedAt[path.first])) {
+                storedAt.insert(pair<int,int>(path.first, heap.insert(path)));
+            }
+
+            // If shorter length update
+            // ChangeKey()
+            if (newDistance < distance.at(path.first)) {
+                path.second = newDistance;
+                heap.changeItemAtKey(storedAt[path.first], path);
+                distance.at(path.first) = newDistance;
+            }
+        }
+    }
+
+    return distance;
 }
 
 #endif

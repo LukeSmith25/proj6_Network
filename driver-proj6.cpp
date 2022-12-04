@@ -14,64 +14,55 @@
 using namespace std;
 
 int main() {
-    ArrayHeap<Process> batch;
-    int numProcess = 0;
-    int id = 0;
-    int startTime = 0, sysClock = 0;
-    int complete = 0, failed = 0;
+    /*
+     * STORE NUMBER OF LINES
+     * PROCESS DELAY TIMES
+     * THEN INITIALIZE GRAPH
+     * DONT END IF NON-VALID MACHINE IS FOUND
+     */
 
-    cin >> numProcess;
-    cin >> startTime;
-    while(numProcess != 0) {
-        Process task(id);
+    // Read in number of machines
+    int numMachines;
+    cin >> numMachines;
+    int numServers;
 
-        if(startTime > sysClock && batch.getNumItems() == 0){
-            sysClock = startTime;
-        }
+    // Map is used like enum
+    map<string, int> vertices;
+    // Store Connections in 'graph'
+    vector<list<pair<string,int>>> connection(numMachines);
 
-        if (id == 0) {
+    /*
+     * ONLY READ IN VERTEX (DW AB CONNECTIONS)
+     * 1. Once all vertices are in map, then you can connect location to location
+     *    using integer values
+     *
+     * Driver is very simple don't overthink it
+     */
+    for (int i = 0; i < numMachines; i++) {
+        string from, to;
+        int cost = 0;
 
-            cin >> task;
-            batch.insert(task);
-            id++;
-            cin >> startTime;
-        }
-
-        if (startTime <= sysClock) {
-            do {
-                task = Process(id++);
-                cin >> task;
-                batch.insert(task);
-//                cout << "inserted" << endl;
-//                batch.checkOrder();
-
-            } while (cin >> startTime && startTime <= sysClock);
-        }
-
-        while (batch.getNumItems() > 0 && ((cin.fail() && numProcess)
-                                           || startTime > sysClock)) {
-            if (batch.getMinItem().canComplete(sysClock)) {
-                cout << "running process id " << batch.getMinItem().getId()
-                     << " at " << sysClock << endl;
-                task = batch.getMinItem();
-                sysClock = task.run(sysClock);
-                complete++;
+        // Read in vertex
+        cin >> from;
+        if (vertices.find(from) == vertices.end()) {
+            if (from.find("_server")) {
+                vertices.insert(pair<string,int>(from, i));
+                numServers++;
             }
-            else {
-                cout << "skipping process id " << batch.getMinItem().getId()
-                     << " at " << sysClock << endl;
-                sysClock++;
-                failed++;
-            }
-            batch.removeMinItem();
-            //batch.checkOrder();
-            numProcess--;
         }
+
+        // Read in Connection
+        cin >> to;
+        cin >> cost;
+        cout << vertices[from] << endl;
+        connection.at(vertices[from]).push_back(pair<string,int>(to, cost));
     }
 
-    cout << "final clock is                 " << sysClock << endl;
-    cout << "number of processes run is     " << complete << endl;
-    cout << "number of processes skipped is " << failed << endl;
+    // Graph to store path
+    Graph network(numServers);
+
+
+
 
     return 0;
 }
